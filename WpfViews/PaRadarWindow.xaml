@@ -1,0 +1,705 @@
+﻿<Window x:Class="JaMoApp.WpfViews.PaRadarWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JaMoApp.WpfViews"
+        xmlns:vm="clr-namespace:JaMoApp.ViewModels"
+        xmlns:converters="clr-namespace:JaMoApp.Converters;assembly=JaMoApp"
+        mc:Ignorable="d"
+        Title="PaRadar - Enhanced Parameter Database Auditing"
+        Height="750"
+        Width="1300"
+        WindowStartupLocation="CenterScreen"
+        Background="#2D2D2D"
+        Foreground="#E0E0E0">
+
+  <Window.Resources>
+    <!-- Enhanced Dark Theme Colors with Gray Tones -->
+    <SolidColorBrush x:Key="DarkBackgroundBrush"
+                     Color="#2D2D2D" />
+    <SolidColorBrush x:Key="DarkSurfaceBrush"
+                     Color="#333333" />
+    <SolidColorBrush x:Key="DarkBorderBrush"
+                     Color="#555555" />
+    <SolidColorBrush x:Key="DarkTextBrush"
+                     Color="#E0E0E0" />
+    <SolidColorBrush x:Key="LightTextBrush"
+                     Color="#FFFFFF" />
+    <SolidColorBrush x:Key="DarkAccentBrush"
+                     Color="#666666" />
+    <SolidColorBrush x:Key="DarkButtonBrush"
+                     Color="#444444" />
+
+    <!-- Gray Row Colors for Calculator1980 -->
+    <SolidColorBrush x:Key="RowBackgroundBrush"
+                     Color="#3A3A3A" />
+    <SolidColorBrush x:Key="AlternatingRowBrush"
+                     Color="#424242" />
+    <SolidColorBrush x:Key="DropdownBackgroundBrush"
+                     Color="#484848" />
+
+    <!-- Status Colors with Better Contrast -->
+    <SolidColorBrush x:Key="SuccessBackgroundBrush"
+                     Color="#2E7D32" />
+    <SolidColorBrush x:Key="SuccessForegroundBrush"
+                     Color="#A5D6A7" />
+    <SolidColorBrush x:Key="ErrorBackgroundBrush"
+                     Color="#C62828" />
+    <SolidColorBrush x:Key="ErrorForegroundBrush"
+                     Color="#FFCDD2" />
+    <SolidColorBrush x:Key="WarningBackgroundBrush"
+                     Color="#F57C00" />
+    <SolidColorBrush x:Key="WarningForegroundBrush"
+                     Color="#FFE0B2" />
+    <SolidColorBrush x:Key="InfoBackgroundBrush"
+                     Color="#1565C0" />
+    <SolidColorBrush x:Key="InfoForegroundBrush"
+                     Color="#BBDEFB" />
+    <SolidColorBrush x:Key="SystemBackgroundBrush"
+                     Color="#6A1B9A" />
+    <SolidColorBrush x:Key="SystemForegroundBrush"
+                     Color="#E1BEE7" />
+    <!-- NEW: Project Parameter Brush (Teal-Blue) -->
+    <SolidColorBrush x:Key="ProjectParameterBrush" Color="#0096C8" />
+
+    <!-- Enhanced TextBox Style -->
+    <Style x:Key="DarkTextBox"
+           TargetType="TextBox">
+      <Setter Property="Background"
+              Value="{StaticResource DropdownBackgroundBrush}" />
+      <Setter Property="Foreground"
+              Value="{StaticResource LightTextBrush}" />
+      <Setter Property="BorderBrush"
+              Value="{StaticResource DarkBorderBrush}" />
+      <Setter Property="Padding"
+              Value="5" />
+      <Setter Property="BorderThickness"
+              Value="1" />
+    </Style>
+
+    <!-- Enhanced Button Style -->
+    <Style x:Key="DarkButton"
+           TargetType="Button">
+      <Setter Property="Background"
+              Value="{StaticResource DarkButtonBrush}" />
+      <Setter Property="Foreground"
+              Value="{StaticResource LightTextBrush}" />
+      <Setter Property="Padding"
+              Value="10,5" />
+      <Setter Property="BorderBrush"
+              Value="{StaticResource DarkAccentBrush}" />
+      <Setter Property="BorderThickness"
+              Value="1" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="3">
+              <ContentPresenter HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="{TemplateBinding Padding}" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver"
+                       Value="True">
+                <Setter Property="Background"
+                        Value="#555555" />
+              </Trigger>
+              <Trigger Property="IsPressed"
+                       Value="True">
+                <Setter Property="Background"
+                        Value="#777777" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Enhanced ComboBox Style with Gray Background -->
+    <Style x:Key="DarkComboBox"
+           TargetType="ComboBox">
+      <Setter Property="Background"
+              Value="{StaticResource DropdownBackgroundBrush}" />
+      <Setter Property="Foreground"
+              Value="{StaticResource LightTextBrush}" />
+      <Setter Property="BorderBrush"
+              Value="{StaticResource DarkBorderBrush}" />
+      <Setter Property="BorderThickness"
+              Value="1" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ComboBox">
+            <Grid>
+              <ToggleButton x:Name="ToggleButton"
+                            Grid.Column="2"
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press"
+                            Background="{StaticResource DropdownBackgroundBrush}"
+                            BorderBrush="{StaticResource DarkBorderBrush}"
+                            BorderThickness="1">
+                <Path x:Name="Arrow"
+                      Fill="{StaticResource LightTextBrush}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Data="M 0 0 L 4 4 L 8 0 Z" />
+              </ToggleButton>
+              <ContentPresenter x:Name="ContentPresenter"
+                                Margin="5,3,25,3"
+                                IsHitTestVisible="False"
+                                Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left" />
+              <Popup x:Name="Popup"
+                     Placement="Bottom"
+                     IsOpen="{TemplateBinding IsDropDownOpen}"
+                     AllowsTransparency="True"
+                     Focusable="False"
+                     PopupAnimation="Slide">
+                <Grid x:Name="DropDown"
+                      SnapsToDevicePixels="True"
+                      MinWidth="{TemplateBinding ActualWidth}"
+                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                  <Border x:Name="DropDownBorder"
+                          Background="{StaticResource DropdownBackgroundBrush}"
+                          BorderBrush="{StaticResource DarkBorderBrush}"
+                          BorderThickness="1" />
+                  <ScrollViewer Margin="4,6,4,6"
+                                SnapsToDevicePixels="True">
+                    <StackPanel IsItemsHost="True"
+                                KeyboardNavigation.DirectionalNavigation="Contained" />
+                  </ScrollViewer>
+                </Grid>
+              </Popup>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+      <Style.Resources>
+        <Style TargetType="ComboBoxItem">
+          <Setter Property="Background"
+                  Value="{StaticResource DropdownBackgroundBrush}" />
+          <Setter Property="Foreground"
+                  Value="{StaticResource LightTextBrush}" />
+          <Setter Property="Padding"
+                  Value="5,2" />
+          <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+              <Setter Property="Background"
+                      Value="{StaticResource DarkAccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsSelected"
+                     Value="True">
+              <Setter Property="Background"
+                      Value="{StaticResource InfoBackgroundBrush}" />
+            </Trigger>
+          </Style.Triggers>
+        </Style>
+      </Style.Resources>
+    </Style>
+
+    <Style x:Key="HeaderTextBlockStyle"
+           TargetType="TextBlock">
+      <Setter Property="FontWeight"
+              Value="Bold" />
+      <Setter Property="FontSize"
+              Value="14" />
+      <Setter Property="Margin"
+              Value="0,0,0,5" />
+      <Setter Property="Foreground"
+              Value="{StaticResource InfoForegroundBrush}" />
+    </Style>
+
+    <Style x:Key="ActionButton"
+           TargetType="Button"
+           BasedOn="{StaticResource DarkButton}">
+      <Setter Property="Padding"
+              Value="5,2" />
+      <Setter Property="Margin"
+              Value="2" />
+      <Setter Property="FontSize"
+              Value="10" />
+      <Setter Property="MinWidth"
+              Value="60" />
+    </Style>
+
+    <Style x:Key="FilterLabel"
+           TargetType="TextBlock">
+      <Setter Property="VerticalAlignment"
+              Value="Center" />
+      <Setter Property="Margin"
+              Value="5,0" />
+      <Setter Property="FontWeight"
+              Value="SemiBold" />
+      <Setter Property="Foreground"
+              Value="{StaticResource InfoForegroundBrush}" />
+    </Style>
+
+    <!-- Boolean to Visibility Converter (built-in) -->
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+  </Window.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <!-- Header with controls -->
+    <Grid Grid.Row="0"
+          Margin="10"
+          Background="{StaticResource DarkSurfaceBrush}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <!-- Title -->
+      <TextBlock Grid.Row="0"
+                 Text="PaRadar - Parameter Database Auditing "
+                 Style="{StaticResource HeaderTextBlockStyle}"
+                 FontSize="18"
+                 Margin="10" />
+
+      <!-- Action Buttons -->
+      <StackPanel Grid.Row="1"
+                  Orientation="Horizontal"
+                  Margin="10,5,10,10">
+        <Button Content="🔍 Scan Parameter Database"
+                Command="{Binding ScanCommand}"
+                Style="{StaticResource DarkButton}"
+                Background="{StaticResource InfoBackgroundBrush}"
+                Foreground="{StaticResource InfoForegroundBrush}"
+                Margin="5" />
+        <Button Content="📊 Export to CSV"
+                Command="{Binding ExportCommand}"
+                Style="{StaticResource DarkButton}"
+                Background="{StaticResource SuccessBackgroundBrush}"
+                Foreground="{StaticResource SuccessForegroundBrush}"
+                Margin="5" />
+        <Button Content="🔥 Show Duplicates Only"
+                Command="{Binding ShowDuplicatesOnlyCommand}"
+                Style="{StaticResource DarkButton}"
+                Background="{StaticResource ErrorBackgroundBrush}"
+                Foreground="{StaticResource ErrorForegroundBrush}"
+                Margin="5" />
+      </StackPanel>
+
+      <!-- Filters -->
+      <Grid Grid.Row="2"
+            Margin="10">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="0"
+                   Text="🔍 Search:"
+                   Style="{StaticResource FilterLabel}" />
+
+        <TextBox Grid.Column="1"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0,0,10,0"
+                 Style="{StaticResource DarkTextBox}"
+                 ToolTip="Search by parameter name, GUID, group, or parameter IDs" />
+
+        <TextBlock Grid.Column="2"
+                   Text="📋 Data Type:"
+                   Style="{StaticResource FilterLabel}" />
+
+        <ComboBox Grid.Column="3"
+                  ItemsSource="{Binding DataTypes}"
+                  SelectedItem="{Binding SelectedDataType}"
+                  Style="{StaticResource DarkComboBox}"
+                  Width="120"
+                  Margin="0,0,10,0" />
+
+        <TextBlock Grid.Column="4"
+                   Text="📈 Usage:"
+                   Style="{StaticResource FilterLabel}" />
+
+        <ComboBox Grid.Column="5"
+                  ItemsSource="{Binding UsageOptions}"
+                  SelectedItem="{Binding SelectedUsage}"
+                  Style="{StaticResource DarkComboBox}"
+                  Width="140" />
+      </Grid>
+    </Grid>
+
+    <!-- Main Content - Enhanced DataGrid with Gray Rows -->
+    <Grid Grid.Row="1"
+          Margin="10,0">
+      <DataGrid ItemsSource="{Binding ParametersView}"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                CanUserSortColumns="True"
+                SelectionMode="Single"
+                GridLinesVisibility="Horizontal"
+                Background="{StaticResource RowBackgroundBrush}"
+                Foreground="{StaticResource LightTextBrush}"
+                AlternatingRowBackground="{StaticResource AlternatingRowBrush}"
+                RowHeaderWidth="0"
+                BorderThickness="1"
+                BorderBrush="{StaticResource DarkBorderBrush}"
+                HeadersVisibility="Column">
+
+        <!-- Enhanced DataGrid Style with Gray Rows -->
+        <DataGrid.Resources>
+          <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background"
+                    Value="{StaticResource DarkButtonBrush}" />
+            <Setter Property="Foreground"
+                    Value="{StaticResource LightTextBrush}" />
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource DarkBorderBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="0,0,1,1" />
+            <Setter Property="Padding"
+                    Value="5" />
+            <Setter Property="FontWeight"
+                    Value="SemiBold" />
+          </Style>
+          <Style TargetType="DataGridCell">
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="Padding"
+                    Value="5,2" />
+            <Setter Property="Foreground"
+                    Value="{StaticResource LightTextBrush}" />
+          </Style>
+          <Style TargetType="DataGridRow">
+            <Setter Property="Background"
+                    Value="{StaticResource RowBackgroundBrush}" />
+            <Setter Property="Foreground"
+                    Value="{StaticResource LightTextBrush}" />
+            <Style.Triggers>
+              <!-- Highlight duplicate rows -->
+              <DataTrigger Binding="{Binding IsDuplicate}"
+                           Value="True">
+                <Setter Property="Background"
+                        Value="#4A2C2A" />
+                <Setter Property="BorderBrush"
+                        Value="{StaticResource ErrorBackgroundBrush}" />
+                <Setter Property="BorderThickness"
+                        Value="0,0,0,1" />
+              </DataTrigger>
+              <!-- Highlight shared parameters (green) -->
+              <DataTrigger Binding="{Binding IsSharedParameter}"
+                           Value="True">
+                <Setter Property="Background"
+                        Value="{StaticResource SuccessBackgroundBrush}" />
+              </DataTrigger>
+              <!-- Highlight project parameters (teal-blue) -->
+              <DataTrigger Binding="{Binding IsSharedParameter}"
+                           Value="False">
+                <Setter Property="Background"
+                        Value="{StaticResource ProjectParameterBrush}" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </DataGrid.Resources>
+
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Name"
+                              Binding="{Binding Name}"
+                              Width="160">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+                <Setter Property="FontWeight"
+                        Value="SemiBold" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <!-- NEW: Enhanced Parameter ID Display -->
+          <DataGridTextColumn Header="Parameter ID(s)"
+                              Binding="{Binding ParameterIdDisplay}"
+                              Width="220">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+                <Setter Property="FontSize"
+                        Value="10" />
+                <Setter Property="FontFamily"
+                        Value="Consolas" />
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding IsDuplicate}"
+                               Value="True">
+                    <Setter Property="Foreground"
+                            Value="{StaticResource ErrorForegroundBrush}" />
+                    <Setter Property="FontWeight"
+                            Value="Bold" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <DataGridTextColumn Header="Version GUID"
+                              Binding="{Binding VersionGuid}"
+                              Width="180">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+                <Setter Property="FontSize"
+                        Value="9" />
+                <Setter Property="FontFamily"
+                        Value="Consolas" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <DataGridTextColumn Header="Data Type"
+                              Binding="{Binding DataType}"
+                              Width="90">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <DataGridTextColumn Header="Group"
+                              Binding="{Binding Group}"
+                              Width="100">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <DataGridTextColumn Header="Element Count"
+                              Binding="{Binding ElementCount}"
+                              Width="90">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+                <Setter Property="FontWeight"
+                        Value="Bold" />
+                <Setter Property="HorizontalAlignment"
+                        Value="Center" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <DataGridTextColumn Header="Status"
+                              Binding="{Binding StatusDisplay}"
+                              Width="90">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Padding"
+                        Value="5,2" />
+                <Setter Property="FontWeight"
+                        Value="SemiBold" />
+                <Setter Property="HorizontalAlignment"
+                        Value="Center" />
+                <!-- Enhanced status colors with better contrast -->
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding StatusDisplay}"
+                               Value="Used">
+                    <Setter Property="Background"
+                            Value="{StaticResource SuccessBackgroundBrush}" />
+                    <Setter Property="Foreground"
+                            Value="White" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding StatusDisplay}"
+                               Value="Duplicate">
+                    <Setter Property="Background"
+                            Value="{StaticResource ErrorBackgroundBrush}" />
+                    <Setter Property="Foreground"
+                            Value="White" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding StatusDisplay}"
+                               Value="Unused">
+                    <Setter Property="Background"
+                            Value="{StaticResource WarningBackgroundBrush}" />
+                    <Setter Property="Foreground"
+                            Value="Black" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <!-- Enhanced Duplicate Status Display -->
+          <DataGridTextColumn Header="Duplicate Status"
+                              Binding="{Binding DuplicateStatus}"
+                              Width="130">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+                <Setter Property="FontSize"
+                        Value="10" />
+                <Setter Property="HorizontalAlignment"
+                        Value="Center" />
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding IsDuplicate}"
+                               Value="True">
+                    <Setter Property="Foreground"
+                            Value="{StaticResource ErrorForegroundBrush}" />
+                    <Setter Property="FontWeight"
+                            Value="Bold" />
+                    <Setter Property="Background"
+                            Value="#4A1C1C" />
+                    <Setter Property="Padding"
+                            Value="3" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <DataGridTextColumn Header="Categories"
+                              Binding="{Binding Categories}"
+                              Width="130">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+                <Setter Property="FontSize"
+                        Value="10" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <DataGridTextColumn Header="Scope"
+                              Binding="{Binding ParameterScope}"
+                              Width="80">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="{StaticResource LightTextBrush}" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+
+          <DataGridTemplateColumn Width="*">
+            <DataGridTemplateColumn.Header>
+              <TextBlock Text="Actions"
+                         Foreground="{StaticResource LightTextBrush}" />
+            </DataGridTemplateColumn.Header>
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                  <Button Content="🔍 Inspect"
+                          Command="{Binding DataContext.InspectParameterCommand, 
+                                                RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          CommandParameter="{Binding}"
+                          Style="{StaticResource ActionButton}"
+                          Background="{StaticResource InfoBackgroundBrush}"
+                          Foreground="{StaticResource LightTextBrush}"
+                          ToolTip="Inspect parameter details and database IDs" />
+
+                  <Button Content="📋 Copy Elements"
+                          Command="{Binding DataContext.CopyElementsCommand, 
+                                                RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          CommandParameter="{Binding}"
+                          Style="{StaticResource ActionButton}"
+                          Background="{StaticResource SuccessBackgroundBrush}"
+                          Foreground="{StaticResource LightTextBrush}"
+                          ToolTip="Copy list of elements using this parameter" />
+
+                  <Button Content="🗑️ Delete"
+                          Command="{Binding DataContext.DeleteParameterCommand, 
+                                                RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          CommandParameter="{Binding}"
+                          Style="{StaticResource ActionButton}"
+                          Background="{StaticResource ErrorBackgroundBrush}"
+                          Foreground="{StaticResource LightTextBrush}"
+                          ToolTip="Delete parameter (enhanced options for duplicates)" />
+
+                  <!-- Enhanced duplicate deletion button -->
+                  <Button Content="🔥 Delete All"
+                          Command="{Binding DataContext.DeleteAllDuplicatesCommand, 
+                                                RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          CommandParameter="{Binding}"
+                          Style="{StaticResource ActionButton}"
+                          Background="#B71C1C"
+                          Foreground="{StaticResource LightTextBrush}"
+                          ToolTip="{Binding DuplicateCount, StringFormat='Delete all {0} duplicate instances from database'}"
+                          Visibility="{Binding IsDuplicate, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </StackPanel>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+      </DataGrid>
+
+      <!-- Progress Overlay -->
+      <Border Background="#80000000"
+              Visibility="{Binding IsProgressVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid Background="{StaticResource DarkSurfaceBrush}"
+              Width="400"
+              Height="140"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <TextBlock Text="{Binding ProgressMessage}"
+                     Grid.Row="0"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     TextWrapping="Wrap"
+                     Margin="15"
+                     FontWeight="SemiBold"
+                     FontSize="12"
+                     Foreground="{StaticResource InfoForegroundBrush}" />
+          <ProgressBar Grid.Row="1"
+                       Value="{Binding ProgressValue}"
+                       Height="20"
+                       Margin="15"
+                       Foreground="{StaticResource InfoForegroundBrush}" />
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- Enhanced Status Bar -->
+    <Grid Grid.Row="2"
+          Background="{StaticResource DarkSurfaceBrush}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <TextBlock Grid.Column="0"
+                 Text="{Binding StatusText}"
+                 Margin="10,5"
+                 Foreground="{StaticResource InfoForegroundBrush}"
+                 TextWrapping="Wrap" />
+
+      <TextBlock Grid.Column="1"
+                 Text="{Binding CountDisplay}"
+                 Margin="10,5"
+                 FontWeight="SemiBold"
+                 Foreground="{StaticResource SuccessForegroundBrush}"
+                 TextWrapping="Wrap" />
+    </Grid>
+  </Grid>
+</Window>

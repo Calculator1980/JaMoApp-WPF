@@ -1,0 +1,299 @@
+﻿<Window x:Class="JaMoApp.WpfViews.MassSurfaceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Mass Surface Generator"
+        Height="450"
+        Width="600"
+        Background="#2D2D2D"
+        Foreground="#E0E0E0">
+  <Window.Resources>
+    <!-- Style for Text Boxes -->
+    <Style x:Key="DarkTextBox"
+           TargetType="TextBox">
+      <Setter Property="Background"
+              Value="#333333" />
+      <Setter Property="Foreground"
+              Value="White" />
+      <Setter Property="BorderBrush"
+              Value="#555555" />
+      <Setter Property="Padding"
+              Value="5" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsGenerating}"
+                     Value="True">
+          <Setter Property="IsEnabled"
+                  Value="False" />
+          <Setter Property="Opacity"
+                  Value="0.6" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <!-- Style for Standard Buttons -->
+    <Style x:Key="DarkButton"
+           TargetType="Button">
+      <Setter Property="Background"
+              Value="#444444" />
+      <Setter Property="Foreground"
+              Value="White" />
+      <Setter Property="Padding"
+              Value="10,5" />
+      <Setter Property="BorderBrush"
+              Value="#666666" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="3">
+              <ContentPresenter HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver"
+                 Value="True">
+          <Setter Property="Background"
+                  Value="#555555" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+
+    <!-- Style for Generate Button -->
+    <Style x:Key="GenerateButton"
+           TargetType="Button"
+           BasedOn="{StaticResource DarkButton}">
+      <Setter Property="Background"
+              Value="#007ACC" />
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver"
+                 Value="True">
+          <Setter Property="Background"
+                  Value="#3399FF" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+
+    <!-- Style for Progress Bar -->
+    <Style x:Key="DarkProgressBar"
+           TargetType="ProgressBar">
+      <Setter Property="Background"
+              Value="#333333" />
+      <Setter Property="Foreground"
+              Value="#007ACC" />
+      <Setter Property="BorderBrush"
+              Value="#555555" />
+      <Setter Property="Height"
+              Value="20" />
+      <Setter Property="BorderThickness"
+              Value="1" />
+    </Style>
+
+    <!-- Style for CheckBoxes -->
+    <Style x:Key="DarkCheckBox"
+           TargetType="CheckBox">
+      <Setter Property="Foreground"
+              Value="#E0E0E0" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsGenerating}"
+                     Value="True">
+          <Setter Property="IsEnabled"
+                  Value="False" />
+          <Setter Property="Opacity"
+                  Value="0.6" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Resources>
+
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- File Selection -->
+    <StackPanel Orientation="Horizontal"
+                Grid.Row="0"
+                Margin="0,0,0,10">
+      <TextBlock Text="Rail Axis File:"
+                 Width="120"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}"
+               Width="300"
+               Style="{StaticResource DarkTextBox}" />
+      <Button Content="Browse"
+              Width="80"
+              Margin="10,0,0,0"
+              Style="{StaticResource DarkButton}"
+              Command="{Binding BrowseCommand}" />
+    </StackPanel>
+
+    <!-- Base Point -->
+    <StackPanel Orientation="Horizontal"
+                Grid.Row="1"
+                Margin="0,0,0,10">
+      <TextBlock Text="Base Point X:"
+                 Width="120"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding BaseX, UpdateSourceTrigger=PropertyChanged}"
+               Width="80"
+               Style="{StaticResource DarkTextBox}" />
+      <TextBlock Text="Y:"
+                 Margin="10,0,0,0"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding BaseY, UpdateSourceTrigger=PropertyChanged}"
+               Width="80"
+               Style="{StaticResource DarkTextBox}"
+               Margin="5,0,0,0" />
+      <TextBlock Text="Z:"
+                 Margin="10,0,0,0"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding BaseZ, UpdateSourceTrigger=PropertyChanged}"
+               Width="80"
+               Style="{StaticResource DarkTextBox}"
+               Margin="5,0,0,0" />
+    </StackPanel>
+
+    <!-- Offsets -->
+    <StackPanel Orientation="Horizontal"
+                Grid.Row="2"
+                Margin="0,0,0,10">
+      <TextBlock Text="Left Offset (m):"
+                 Width="120"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding LeftOffset, UpdateSourceTrigger=PropertyChanged}"
+               Width="80"
+               Style="{StaticResource DarkTextBox}" />
+      <TextBlock Text="Right Offset (m):"
+                 Margin="20,0,0,0"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding RightOffset, UpdateSourceTrigger=PropertyChanged}"
+               Width="80"
+               Style="{StaticResource DarkTextBox}"
+               Margin="5,0,0,0" />
+    </StackPanel>
+
+    <!-- Bottom Offset -->
+    <StackPanel Orientation="Horizontal"
+                Grid.Row="3"
+                Margin="0,0,0,10">
+      <TextBlock Text="Bottom Offset (m):"
+                 Width="120"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding BottomOffset, UpdateSourceTrigger=PropertyChanged}"
+               Width="80"
+               Style="{StaticResource DarkTextBox}" />
+      <TextBlock Text="(positive = below axis)"
+                 Margin="10,0,0,0"
+                 VerticalAlignment="Center"
+                 FontSize="10"
+                 Foreground="#A0A0A0" />
+    </StackPanel>
+
+    <!-- Total Height -->
+    <StackPanel Orientation="Horizontal"
+                Grid.Row="4"
+                Margin="0,0,0,10">
+      <TextBlock Text="Total Height (m):"
+                 Width="120"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding Height, UpdateSourceTrigger=PropertyChanged}"
+               Width="80"
+               Style="{StaticResource DarkTextBox}" />
+      <TextBlock Text="(positive value)"
+                 Margin="10,0,0,0"
+                 VerticalAlignment="Center"
+                 FontSize="10"
+                 Foreground="#A0A0A0" />
+    </StackPanel>
+
+    <!-- Inclination Angle -->
+    <StackPanel Orientation="Horizontal"
+                Grid.Row="5"
+                Margin="0,0,0,10">
+      <TextBlock Text="Inclination (° from vertical):"
+                 Width="180"
+                 VerticalAlignment="Center" />
+      <TextBox Text="{Binding AngleDegrees, UpdateSourceTrigger=PropertyChanged}"
+               Width="80"
+               Style="{StaticResource DarkTextBox}" />
+      <TextBlock Text="(90 = vertical, 0 = near horizontal)"
+                 Margin="10,0,0,0"
+                 VerticalAlignment="Center"
+                 FontSize="10"
+                 Foreground="#A0A0A0" />
+    </StackPanel>
+
+    <!-- Side Selection -->
+    <StackPanel Orientation="Horizontal"
+                Grid.Row="6"
+                Margin="0,0,0,10">
+      <CheckBox Content="Left Side"
+                IsChecked="{Binding CreateLeftSurface}"
+                Style="{StaticResource DarkCheckBox}" />
+      <CheckBox Content="Right Side"
+                IsChecked="{Binding CreateRightSurface}"
+                Style="{StaticResource DarkCheckBox}"
+                Margin="20,0,0,0" />
+    </StackPanel>
+
+    <!-- Generate Button -->
+    <Button Content="Generate"
+            Grid.Row="7"
+            HorizontalAlignment="Right"
+            Width="100"
+            Height="30"
+            Style="{StaticResource GenerateButton}"
+            Command="{Binding GenerateCommand}" />
+
+    <!-- Progress Bar Section -->
+    <StackPanel Grid.Row="8"
+                Margin="0,10,0,0">
+      <StackPanel.Style>
+        <Style TargetType="StackPanel">
+          <Setter Property="Visibility"
+                  Value="Collapsed" />
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding IsProgressVisible}"
+                         Value="True">
+              <Setter Property="Visibility"
+                      Value="Visible" />
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </StackPanel.Style>
+
+      <TextBlock Text="{Binding ProgressMessage}"
+                 Foreground="#E0E0E0"
+                 Margin="0,0,0,5"
+                 FontSize="12" />
+      <ProgressBar Value="{Binding ProgressValue}"
+                   Maximum="100"
+                   Style="{StaticResource DarkProgressBar}" />
+      <TextBlock Text="{Binding ProgressValue, StringFormat={}{0:F0}%}"
+                 HorizontalAlignment="Center"
+                 Foreground="#A0A0A0"
+                 FontSize="10"
+                 Margin="0,2,0,0" />
+    </StackPanel>
+
+    <!-- Status -->
+    <TextBlock Text="{Binding Status}"
+               Grid.Row="10"
+               Foreground="#A0A0A0"
+               VerticalAlignment="Bottom" />
+  </Grid>
+</Window>
